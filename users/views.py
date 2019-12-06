@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from users.serializers import UserSerializer, GroupSerializer
 from .serializers import ProfileSerializer
 from .models import Profile
@@ -20,6 +22,8 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -38,56 +42,12 @@ class ProfileViewSet(viewsets.ModelViewSet):
     serializer_class = ProfileSerializer
 
 
-class UserList(generics.ListCreateAPIView):
+class UserCreate(generics.CreateAPIView):
     """
     API endpoint that represents a list of users.
     """
     model = User
-    queryset = User.objects.all().order_by('-date_joined')
+    queryset = User.objects.all()
     serializer_class = UserSerializer
 
-
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    """
-    API endpoint that represents a single user.
-    """
-    model = User
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-
-
-class GroupList(generics.ListCreateAPIView):
-    """
-    API endpoint that represents a list of groups.
-    """
-    model = Group
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-
-
-class GroupDetail(generics.RetrieveUpdateDestroyAPIView):
-    """
-    API endpoint that represents a single group.
-    """
-    model = Group
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-
-
-class ProfileList(generics.ListCreateAPIView):
-    """
-    API endpoint that represents a list of profiles.
-    """
-    model = Profile
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
-
-
-class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
-    """
-    API endpoint that represents a single profile.
-    """
-    model = Profile
-    queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
 
