@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User, Group, Permission
 from rest_framework import serializers
 from .models import Profile
 
@@ -6,14 +6,14 @@ from .models import Profile
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'url', 'username', 'email', 'groups']
+        fields = ['url', 'username', 'email', 'groups']
         ordering = ['-id']
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
-        fields = ['url', 'name']
+        fields = ('url', 'name')
         ordering = ['-id']
 
 
