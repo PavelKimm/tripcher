@@ -1,31 +1,30 @@
-from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
-from .views import UserCreateView, UserViewSet, GroupViewSet, \
-                   ProfileCreateView, ProfileListView, ProfileDetailView
-from rest_framework.authtoken import views
-from django.contrib.auth.views import LoginView
+# from rest_framework.authtoken import views
+from .views import (UserCreateView, UserViewSet,
+                    GroupViewSet, ProfileCreateView,
+                    ProfileListView, ProfileDetailView,
+                    # SocialLoginView
+                    )
 
 
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'groups', GroupViewSet)
 
-# Wire up our API using automatic URL routing.
-# Additionally, we include login URLs for the browsable API.
 urlpatterns = [
+    path('users/create/', UserCreateView.as_view(), name='user-create'),
     path('', include(router.urls)),
+
     path('profiles/', ProfileListView.as_view(), name=''),
     path('profiles/create', ProfileCreateView.as_view(), name=''),
     path('profiles/<int:pk>/', ProfileDetailView.as_view(), name='profile-detail'),
-    path('registration/', UserCreateView.as_view(), name='registration'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
+
+    path('auth/', include('djoser.urls')),
+    path('base-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('auth_token/', include('djoser.urls.authtoken')),
+    # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
+    path('auth/', include('rest_framework_social_oauth2.urls')),
+    # path('oauth/login/', SocialLoginView.as_view())
 
 ]
-
-# # Default login/logout views
-# urlpatterns += [
-#     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-# ]
-

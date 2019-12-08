@@ -1,19 +1,18 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets, generics
 from users.serializers import UserSerializer, GroupSerializer
-from .serializers import ProfileSerializer
+from . import serializers
 from .models import Profile
-
-from rest_framework.authentication import TokenAuthentication
+from .permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 
-from django.http import HttpResponse, JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser
-
-from rest_framework.decorators import api_view
-from rest_framework.reverse import reverse
+from rest_framework import generics, permissions, status, views
 from rest_framework.response import Response
+from requests.exceptions import HTTPError
+from social_django.utils import load_strategy, load_backend
+from social_core.backends.oauth import BaseOAuth2
+from social_core.exceptions import MissingBackend, AuthTokenError, AuthForbidden
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -32,13 +31,14 @@ class GroupViewSet(viewsets.ModelViewSet):
     """
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = (IsAuthenticated, )
 
 
 class ProfileCreateView(generics.CreateAPIView):
     """
     API endpoint that allows profiles to be created.
     """
-    serializer_class = ProfileSerializer
+    serializer_class = serializers.ProfileSerializer
 
 
 class ProfileListView(generics.ListAPIView):
@@ -46,7 +46,7 @@ class ProfileListView(generics.ListAPIView):
     API endpoint that allows all profiles to be viewed as list.
     """
     queryset = Profile.objects.all().order_by('-id')
-    serializer_class = ProfileSerializer
+    serializer_class = serializers.ProfileSerializer
 
 
 class ProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -54,10 +54,78 @@ class ProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
     API endpoint that allows profiles to be viewed or edited.
     """
     queryset = Profile.objects.all()
-    serializer_class = ProfileSerializer
+    serializer_class = serializers.ProfileSerializer
+    permission_classes = (IsOwnerOrReadOnly, )
 
 
 class UserCreateView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 
+
+
+# class SocialLoginView(generics.GenericAPIView):
+#     """Log in using facebook"""
+#     serializer_class = serializers.SocialSerializer
+#     permission_classes = [permissions.AllowAny]
+#
+#     def post(self, request):
+#         """Authenticate user through the provider and access_token"""
+#         serializer = self.serializer_class(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         provider = serializer.data.get('provider', None)
+#         strategy = load_strategy(request)
+#
+#         try:
+#             backend = load_backend(strategy=strategy, name=provider,
+#                                    redirect_uri=None)
+#
+#         except MissingBackend:
+#             return Response({'error': 'Please provide a valid provider'},
+#                             status=status.HTTP_400_BAD_REQUEST)
+#         try:
+#             if isinstance(backend, BaseOAuth2):
+#                 access_token = serializer.data.get('access_token')
+#             user = backend.do_auth(access_token)
+#         except HTTPError as error:
+#             return Response({
+#                 "error": {
+#                     "access_token": "Invalid token",
+#                     "details": str(error)
+#                 }
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#         except AuthTokenError as error:
+#             return Response({
+#                 "error": "Invalid credentials",
+#                 "details": str(error)
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         try:
+#             authenticated_user = backend.do_auth(access_token, user=user)
+#
+#         except HTTPError as error:
+#             return Response({
+#                 "error": "invalid token",
+#                 "details": str(error)
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         except AuthForbidden as error:
+#             return Response({
+#                 "error": "invalid token",
+#                 "details": str(error)
+#             }, status=status.HTTP_400_BAD_REQUEST)
+#
+#         if authenticated_user and authenticated_user.is_active:
+#             # generate JWT token
+#             login(request, authenticated_user)
+#             data = {
+#                 "token": jwt_encode_handler(
+#                     jwt_payload_handler(user)
+#                 )}
+#             # customize the response to your needs
+#             response = {
+#                 "email": authenticated_user.email,
+#                 "username": authenticated_user.username,
+#                 "token": data.get('token')
+#             }
+#             return Response(status=status.HTTP_200_OK, data=response)
