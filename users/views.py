@@ -73,13 +73,6 @@ class SocialLoginView(generics.GenericAPIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        user = request.data
-        serializer = UserSerializer(data=user)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    def post(self, request):
         """Authenticate user through the provider and access_token"""
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -128,10 +121,10 @@ class SocialLoginView(generics.GenericAPIView):
         if authenticated_user and authenticated_user.is_active:
             # generate JWT token
             login(request, authenticated_user)
+            print(authenticated_user)
             data = {
-                "token": jwt_encode_handler(
-                    jwt_payload_handler(user)
-                )}
+                "token": jwt_encode_handler(jwt_payload_handler(user))
+            }
             # customize the response to your needs
             response = {
                 "email": authenticated_user.email,
