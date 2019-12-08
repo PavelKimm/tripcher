@@ -4,7 +4,7 @@ from rest_framework import routers
 from .views import (UserCreateView, UserViewSet,
                     GroupViewSet, ProfileCreateView,
                     ProfileListView, ProfileDetailView,
-                    # SocialLoginView
+                    SocialLoginView
                     )
 
 
@@ -25,6 +25,6 @@ urlpatterns = [
     path('auth_token/', include('djoser.urls.authtoken')),
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
     path('auth/', include('rest_framework_social_oauth2.urls')),
-    # path('oauth/login/', SocialLoginView.as_view())
+    path('oauth/login/', SocialLoginView.as_view())
 
 ]
