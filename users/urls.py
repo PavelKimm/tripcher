@@ -23,8 +23,6 @@ urlpatterns = [
     path('profiles/create', ProfileCreateView.as_view(), name='profile-create'),
     path('profiles/<int:pk>/', ProfileDetailView.as_view(), name='profile-detail'),
 
-    # path('auth/', include('djoser.urls')),
-    # path('auth_token/', include('djoser.urls.authtoken')),
     # path('api-token-auth/', views.obtain_auth_token, name='api-token-auth'),
     path('base-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('auth/', include('rest_framework_social_oauth2.urls')),

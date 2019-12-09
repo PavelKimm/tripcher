@@ -34,7 +34,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Update and return an existing `Snippet` instance, given the validated data.
+        Update and return an existing `Profile` instance, given the validated data.
         """
         instance.user = validated_data.get('user', instance.user)
         instance.image = validated_data.get('image', instance.image)
