@@ -121,7 +121,6 @@ class SocialLoginView(generics.GenericAPIView):
         if authenticated_user and authenticated_user.is_active:
             # generate JWT token
             login(request, authenticated_user)
-            print(authenticated_user)
             data = {
                 "token": jwt_encode_handler(jwt_payload_handler(user))
             }

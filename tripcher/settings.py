@@ -38,13 +38,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
+    'users.apps.UsersConfig',
+
     'rest_framework',
     'rest_framework.authtoken',
-    'users.apps.UsersConfig',
-    'djoser',
+    'rest_auth',
+
+    # 'djoser',
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
+
+    'rest_auth.registration',
 ]
 
 MIDDLEWARE = [
@@ -73,7 +79,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
-                'social_django.context_processors.login_redirect',
+                # 'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -161,20 +167,25 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    # Facebook OAuth2
-    'social_core.backends.facebook.FacebookAppOAuth2',
-    'social_core.backends.facebook.FacebookOAuth2',
-
     # django-rest-framework-social-oauth2
     'rest_framework_social_oauth2.backends.DjangoOAuth2',
-
     # Django
     'django.contrib.auth.backends.ModelBackend',
+
+    'social_core.backends.facebook.FacebookAppOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.vk.VKOAuth2',
 )
+
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/api/v1/'
+
+SOCIAL_AUTH_VK_OAUTH2_SCOPE = ['email']
+SOCIAL_AUTH_VK_OAUTH2_KEY = config('SOCIAL_AUTH_VK_OAUTH2_KEY')
+SOCIAL_AUTH_VK_OAUTH2_SECRET = config('SOCIAL_AUTH_VK_OAUTH2_SECRET')
+
 
 SOCIAL_AUTH_FACEBOOK_KEY = config('FACEBOOK_APP_ID')
 SOCIAL_AUTH_FACEBOOK_SECRET = config('FACEBOOK_SECRET_KEY')
-SOCIAL_AUTH_LOGIN_REDIRECT_URL = '/'
 SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'id, name, email'
 }
@@ -194,3 +205,11 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
 )
+
+REST_USE_JWT = True
+
+SITE_ID = 1
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
