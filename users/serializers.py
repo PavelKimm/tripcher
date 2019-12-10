@@ -3,27 +3,10 @@ from rest_framework import serializers
 from .models import Profile
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = User
-        fields = ['url', 'username', 'email', 'groups']
-        ordering = ['-id']
-
-
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = Group
-        fields = ['url', 'name']
-        ordering = ['-id']
-
-
 class ProfileSerializer(serializers.ModelSerializer):
-    # username = serializers.CharField(source='user.username')
-    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
     class Meta:
         model = Profile
-        fields = ['url', 'user', 'image', 'bio', 'city', 'birth_date']
+        fields = ['url', 'image', 'bio', 'city', 'birth_date']
         ordering = ['-id']
 
     def create(self, validated_data):
@@ -43,6 +26,25 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.birth_date = validated_data.get('birth_date', instance.birth_date)
         instance.save()
         return instance
+
+
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    profile = ProfileSerializer(required=True)
+
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'profile', 'email', 'groups']
+        ordering = ['-id']
+
+
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['url', 'name']
+        ordering = ['-id']
+
+
+
 
 
 class SocialSerializer(serializers.Serializer):
