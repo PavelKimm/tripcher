@@ -9,6 +9,8 @@ class Profile(models.Model):
     bio = models.TextField(max_length=500, blank=True)
     city = models.CharField(max_length=30, blank=True)
     birth_date = models.DateField(null=True, blank=True)
+    friends = models.ManyToManyField('self', symmetrical=False,
+                                     related_name='friends+')
 
     def __str__(self):
         return f'{self.user.username}\'s profile'
@@ -22,3 +24,17 @@ class Profile(models.Model):
             output_size = (300, 300)
             img.thumbnail(output_size)
             img.save(self.image.path)
+
+    @classmethod
+    def make_friend(cls, from_profile, to_profile):
+        friend, created = cls.objects.get_or_create(
+            user=from_profile
+        )
+        friend.friends.add(to_profile)
+
+    @classmethod
+    def remove_friend(cls, from_profile, to_profile):
+        friend, created = cls.objects.get_or_create(
+            user=from_profile
+        )
+        friend.friends.remove(to_profile)

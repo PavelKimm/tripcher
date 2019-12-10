@@ -29,6 +29,13 @@ class ProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
+class FriendsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('url', 'friends')
+        ordering = ('-id',)
+
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User

@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework import routers
 from .views import (UserCreateView, UserViewSet, GroupViewSet,
                     ProfileListView, ProfileDetailView,
-                    CurrentUserProfileView)
+                    CurrentUserProfileView, change_friend,
+                    FriendsListView)
 
 
 router = routers.DefaultRouter()
@@ -23,4 +24,7 @@ urlpatterns = [
     # http://localhost:8000/api/v1/login/vk-oauth2 --- authentication
 
     # path('rest-auth/', include('rest_auth.urls')),
+
+    path('users/<str:operation>/<int:pk>/', change_friend, name='change_friend'),
+    path('friends/', FriendsListView.as_view(), name='friends_list'),
 ]

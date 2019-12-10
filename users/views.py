@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 
 from rest_framework import generics, permissions, status, views
 from rest_framework.response import Response
+from django.shortcuts import redirect
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -27,7 +28,7 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 
 class ProfileListView(generics.ListAPIView):
-    queryset = Profile.objects.all().order_by('-id')
+    queryset = Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
 
 
@@ -46,3 +47,17 @@ class CurrentUserProfileView(APIView):
 
 class UserCreateView(generics.CreateAPIView):
     serializer_class = serializers.UserSerializer
+
+
+class FriendsListView(generics.ListAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = serializers.FriendsSerializer
+
+
+def change_friend(request, operation, pk):
+    to_profile = Profile.objects.get(pk=pk)
+    if operation == 'add':
+        Profile.make_friend(request.user, to_profile)
+    elif operation == 'remove':
+        Profile.remove_friend(request.user, to_profile)
+    return redirect('current-user-profile')
