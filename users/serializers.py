@@ -4,10 +4,12 @@ from .models import Profile
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username', read_only=True)
+
     class Meta:
         model = Profile
-        fields = ['url', 'image', 'bio', 'city', 'birth_date']
-        ordering = ['-id']
+        fields = ('url', 'username', 'image', 'bio', 'city', 'birth_date')
+        ordering = ('-id',)
 
     def create(self, validated_data):
         """
@@ -19,7 +21,6 @@ class ProfileSerializer(serializers.ModelSerializer):
         """
         Update and return an existing `Profile` instance, given the validated data.
         """
-        instance.user = validated_data.get('user', instance.user)
         instance.image = validated_data.get('image', instance.image)
         instance.bio = validated_data.get('bio', instance.bio)
         instance.city = validated_data.get('city', instance.city)
@@ -29,11 +30,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    profile = ProfileSerializer(required=True)
-
     class Meta:
         model = User
-        fields = ['url', 'username', 'profile', 'email', 'groups']
+        fields = ['url', 'username', 'email', 'groups']
         ordering = ['-id']
 
 
@@ -42,26 +41,3 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         model = Group
         fields = ['url', 'name']
         ordering = ['-id']
-
-
-
-
-
-class SocialSerializer(serializers.Serializer):
-    """
-    Serializer which accepts an OAuth2 access token and provider.
-    """
-    provider = serializers.CharField(max_length=255, required=True)
-    access_token = serializers.CharField(max_length=4096, required=True, trim_whitespace=True)
-
-    # def create(self, validated_data):
-    #     """
-    #     Create and return a new `User` instance, given the validated data.
-    #     """
-    #     return User.objects.create(**validated_data)
-
-    # def update(self, instance, validated_data):
-    #     instance.username = validated_data.get('user', instance.username)
-    #     instance.email = validated_data.get('email', instance.email)
-    #     instance.save()
-    #     return instance

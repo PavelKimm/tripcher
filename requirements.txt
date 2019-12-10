@@ -3,7 +3,6 @@ certifi==2019.11.28
 chardet==3.0.4
 defusedxml==0.6.0
 Django==3.0
-django-allauth==0.40.0
 django-braces==1.13.0
 django-cors-headers==3.2.0
 django-filter==2.2.0
@@ -13,7 +12,6 @@ django-rest-framework-social-oauth2==1.1.0
 django-templated-mail==1.1.1
 djangorestframework==3.10.3
 djangorestframework-jwt==1.11.0
-djoser==2.0.3
 httpie==1.0.3
 idna==2.8
 Markdown==3.1.1

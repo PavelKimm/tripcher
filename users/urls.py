@@ -2,8 +2,7 @@ from django.urls import path, include
 from rest_framework import routers
 from .views import (UserCreateView, UserViewSet, GroupViewSet,
                     ProfileListView, ProfileDetailView,
-                    # SocialLoginView
-                    )
+                    CurrentUserProfileView)
 
 
 router = routers.DefaultRouter()
@@ -14,6 +13,7 @@ urlpatterns = [
     path('create_user/', UserCreateView.as_view(), name='user-create'),
     path('profiles/', ProfileListView.as_view(), name='profiles-list'),
     path('profiles/<int:pk>/', ProfileDetailView.as_view(), name='profile-detail'),
+    path('users/profile/', CurrentUserProfileView.as_view(), name='current-user-profile'),
     path('', include(router.urls)),
     path('', include('django.contrib.auth.urls')),
     path('base-auth/', include('rest_framework.urls', namespace='rest_framework')),
