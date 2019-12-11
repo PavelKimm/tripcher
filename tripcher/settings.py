@@ -40,12 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'users.apps.UsersConfig',
+    'blog.apps.BlogConfig',
 
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
 
-    # 'djoser',
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
