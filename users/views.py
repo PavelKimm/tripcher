@@ -56,8 +56,9 @@ class FriendsListView(generics.ListAPIView):
 
 def change_friend(request, operation, pk):
     to_profile = Profile.objects.get(pk=pk)
-    if operation == 'add':
-        Profile.make_friend(request.user, to_profile)
-    elif operation == 'remove':
-        Profile.remove_friend(request.user, to_profile)
+    if request.user.profile.id != pk:
+        if operation == 'add':
+            Profile.make_friend(request.user, to_profile)
+        elif operation == 'remove':
+            Profile.remove_friend(request.user, to_profile)
     return redirect('current-user-profile')
