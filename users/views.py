@@ -1,24 +1,27 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets, generics
 from rest_framework.views import APIView
-
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.response import Response
+from django.shortcuts import redirect
 from . import serializers
 from .models import Profile
 from .permissions import IsOwnerOrReadOnly, IsCurrentUserOrReadOnly
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-
-from rest_framework import generics, permissions, status, views
-from rest_framework.response import Response
-from django.shortcuts import redirect
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
+class UserCreateView(generics.CreateAPIView):
+    serializer_class = serializers.UserCreationSerializer
+
+
+class UserListView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, IsCurrentUserOrReadOnly, )
+
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
+    permission_classes = (IsCurrentUserOrReadOnly, )
 
 
 class GroupViewSet(viewsets.ModelViewSet):
@@ -43,10 +46,6 @@ class CurrentUserProfileView(APIView):
         profile = self.request.user.profile
         serializer = serializers.ProfileSerializer(profile, context={'request': request})
         return Response({'profile': serializer.data})
-
-
-class UserCreateView(generics.CreateAPIView):
-    serializer_class = serializers.UserSerializer
 
 
 class FriendsListView(generics.ListAPIView):
