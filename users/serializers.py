@@ -8,7 +8,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('url', 'username', 'image', 'bio', 'city', 'birth_date')
+        fields = ('url', 'username', 'image', 'bio', 'city', 'birth_date', 'friends')
+        read_only_fields = ('friends', )
         ordering = ('-id',)
 
     def create(self, validated_data):
