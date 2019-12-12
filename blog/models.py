@@ -12,8 +12,8 @@ class Post(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    users_liked = models.ManyToManyField(Profile)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_author')
+    users_liked = models.ManyToManyField(User)
     likes_number = models.PositiveIntegerField(default=0)
 
     def __str__(self):
@@ -36,6 +36,12 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
+
+    def like_post(self, user):
+        if user not in self.users_liked.all():
+            self.likes_number += 1
+            self.users_liked.add(user)
+        self.save()
 
 
 class Draft(models.Model):
