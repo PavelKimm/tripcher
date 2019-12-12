@@ -11,7 +11,7 @@ class Post(models.Model):
     image = models.ImageField(default='post_pics/test.png', upload_to='post_pics')
     content = models.TextField()
     created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_author')
     users_liked = models.ManyToManyField(User)
     likes_number = models.PositiveIntegerField(default=0)
@@ -39,9 +39,9 @@ class Post(models.Model):
 
     def like_post(self, user):
         if user not in self.users_liked.all():
-            self.likes_number += 1
+            self.likes_number = Post.objects.get(id=self.id).likes_number + 1
             self.users_liked.add(user)
-        self.save()
+            self.save()
 
 
 class Draft(models.Model):

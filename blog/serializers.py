@@ -5,7 +5,7 @@ from . import models
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Comment
-        fields = ('id', 'post', 'sender', 'content')
+        fields = ('url', 'post', 'sender', 'content')
         read_only_fields = ('post', 'sender')
 
 
@@ -14,10 +14,10 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Post
-        fields = ('id', 'author', 'title', 'image', 'content',
+        fields = ('url', 'author', 'title', 'image', 'content',
                   'created_at', 'updated_at', 'likes_number',
                   'users_liked', 'comments')
-        read_only_fields = ('created_at', 'author',
+        read_only_fields = ('author', 'created_at', 'updated_at',
                             'likes_number', 'users_liked')
         ordering = ('-id', )
 
@@ -25,7 +25,7 @@ class PostSerializer(serializers.ModelSerializer):
 class DraftSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Draft
-        fields = ('id', 'author', 'title', 'image', 'content',
+        fields = ('url', 'author', 'title', 'image', 'content',
                   'created_at', 'updated_at')
         read_only_fields = ('created_at', 'author')
         ordering = ('-id', )
