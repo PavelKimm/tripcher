@@ -13,7 +13,7 @@ class Post(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='post_author')
-    users_liked = models.ManyToManyField(User)
+    users_liked = models.ManyToManyField(User, blank=True)
     likes_number = models.PositiveIntegerField(default=0)
 
     def __str__(self):

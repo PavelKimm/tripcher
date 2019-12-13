@@ -5,6 +5,7 @@ from .models import Post, Comment, Draft
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from .permissions import IsOwnerOrReadOnly, IsSenderOrReadOnly
 from .serializers import PostSerializer, CommentSerializer, DraftSerializer
+from rest_framework.filters import OrderingFilter
 
 
 class DraftCreation(generics.CreateAPIView):
@@ -36,11 +37,24 @@ class PostCreation(generics.CreateAPIView):
     def perform_create(self, serializer):
         author = self.request.user
         serializer.save(author=author)
+        Draft.objects.filter(id=self.kwargs['pk']).delete()
 
 
 class PostList(generics.ListAPIView):
-    queryset = Post.objects.all()
     serializer_class = PostSerializer
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['title', 'created_at', 'updated_at', 'author', 'likes_number']
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned purchases to a given user,
+        by filtering against a `username` query parameter in the URL.
+        """
+        queryset = Post.objects.all()
+        author_id = self.request.query_params.get('author_id', None)
+        if author_id is not None:
+            queryset = queryset.filter(author=author_id)
+        return queryset
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -73,10 +87,6 @@ class CommentViewSet(viewsets.ModelViewSet):
     #     serializer.is_valid(raise_exception=True)
     #     serializer.save()
     #     return Response(serializer.data)
-
-
-def confirm_draft(request):
-    pass
 
 
 def like(request, pk):

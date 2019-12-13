@@ -19,7 +19,6 @@ class PostSerializer(serializers.ModelSerializer):
                   'users_liked', 'comments')
         read_only_fields = ('author', 'created_at', 'updated_at',
                             'likes_number', 'users_liked')
-        ordering = ('-id', )
 
 
 class DraftSerializer(serializers.ModelSerializer):
@@ -28,4 +27,3 @@ class DraftSerializer(serializers.ModelSerializer):
         fields = ('url', 'author', 'title', 'image', 'content',
                   'created_at', 'updated_at')
         read_only_fields = ('created_at', 'author')
-        ordering = ('-id', )
