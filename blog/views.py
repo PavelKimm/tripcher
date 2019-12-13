@@ -19,8 +19,8 @@ class DraftCreation(generics.CreateAPIView):
 
 
 class DraftList(generics.ListAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostSerializer
+    queryset = Draft.objects.all()
+    serializer_class = DraftSerializer
 
 
 class DraftDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -43,7 +43,7 @@ class PostCreation(generics.CreateAPIView):
 class PostList(generics.ListAPIView):
     serializer_class = PostSerializer
     filter_backends = [OrderingFilter]
-    ordering_fields = ['title', 'created_at', 'updated_at', 'author', 'likes_number']
+    ordering_fields = ['id', 'title', 'created_at', 'updated_at', 'author', 'likes_number']
 
     def get_queryset(self):
         """
