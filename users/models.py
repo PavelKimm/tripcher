@@ -17,12 +17,17 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-
         img = Image.open(self.image.path)
-
-        if img.height > 300 or img.width > 300:
-            output_size = (300, 300)
-            img.thumbnail(output_size)
+        max_size = 300
+        if img.height > max_size:
+            h_percent = max_size / float(img.size[1])
+            w_size = int(float(img.size[0]) * h_percent)
+            img.thumbnail((w_size, max_size))
+            img.save(self.image.path)
+        if img.width > max_size:
+            w_percent = max_size / float(img.size[0])
+            h_size = int(float(img.size[1]) * w_percent)
+            img.thumbnail((max_size, h_size))
             img.save(self.image.path)
 
     @classmethod

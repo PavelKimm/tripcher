@@ -40,12 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'users.apps.UsersConfig',
+    'blog.apps.BlogConfig',
 
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
 
-    # 'djoser',
     'oauth2_provider',
     'social_django',
     'rest_framework_social_oauth2',
@@ -163,7 +163,9 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'rest_framework_social_oauth2.authentication.SocialAuthentication',
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-    ]
+    ],
+
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 AUTHENTICATION_BACKENDS = (

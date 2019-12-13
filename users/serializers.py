@@ -8,8 +8,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Profile
-        fields = ('url', 'username', 'image', 'bio', 'city', 'birth_date')
-        ordering = ('-id',)
+        fields = ('url', 'username', 'image', 'bio', 'city', 'birth_date', 'friends')
+        read_only_fields = ('friends', )
 
     def create(self, validated_data):
         """
@@ -33,18 +33,33 @@ class FriendsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('url', 'friends')
-        ordering = ('-id',)
+
+
+class UserCreationSerializer(serializers.HyperlinkedModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    def create(self, validated_data):
+        user = User.objects.create(
+            username=validated_data['username'],
+            email=validated_data['email']
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+    class Meta:
+        model = User
+        fields = ['url', 'username', 'email', 'password']
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+
     class Meta:
         model = User
-        fields = ['url', 'username', 'email', 'groups']
-        ordering = ['-id']
+        fields = ['url', 'username', 'email']
 
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Group
         fields = ['url', 'name']
-        ordering = ['-id']
