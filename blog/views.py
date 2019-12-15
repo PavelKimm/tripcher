@@ -1,4 +1,6 @@
+from datetime import timedelta, date, datetime, time
 from django.shortcuts import redirect
+
 from rest_framework import generics, viewsets
 from django.utils import timezone
 from .models import Post, Comment, Draft
@@ -6,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from .permissions import IsOwnerOrReadOnly, IsSenderOrReadOnly
 from .serializers import PostSerializer, CommentSerializer, DraftSerializer
 from rest_framework.filters import OrderingFilter
+from django.db.models.functions import ExtractMonth, ExtractWeek, ExtractDay
 
 
 class DraftCreation(generics.CreateAPIView):
@@ -37,7 +40,8 @@ class PostCreation(generics.CreateAPIView):
     def perform_create(self, serializer):
         author = self.request.user
         serializer.save(author=author)
-        Draft.objects.filter(id=self.kwargs['pk']).delete()
+        if 'pk' in self.kwargs:
+            Draft.objects.filter(id=self.kwargs['pk']).delete()
 
 
 class PostList(generics.ListAPIView):
@@ -50,7 +54,23 @@ class PostList(generics.ListAPIView):
         Optionally restricts the returned purchases to a given user,
         by filtering against a `username` query parameter in the URL.
         """
-        queryset = Post.objects.all()
+        queryset = Post.objects.all().order_by('-created_at')
+
+        if 'period' in self.kwargs:
+            today = date.today()
+            if self.kwargs['period'] == 'month':
+                queryset = queryset.filter(created_at__year=today.year,
+                                           created_at__month=today.month)
+            elif self.kwargs['period'] == 'week':
+                week_ago = today - timedelta(days=7)
+                # today_max = today + timedelta(days=1)
+                today_max = datetime.combine(today, time.max)
+                queryset = queryset.filter(created_at__range=(week_ago, today_max))
+            elif self.kwargs['period'] == 'day':
+                queryset = queryset.filter(created_at__year=today.year,
+                                           created_at__month=today.month,
+                                           created_at__day=today.day)
+
         author_id = self.request.query_params.get('author_id', None)
         if author_id is not None:
             queryset = queryset.filter(author=author_id)
