@@ -1,6 +1,8 @@
 from django.urls import path, include
 from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+
 from .views import (UserCreateView, UserListView, UserDetailView, GroupViewSet,
                     ProfileListView, ProfileDetailView,
                     CurrentUserProfileView, change_friend,
@@ -20,10 +22,17 @@ urlpatterns = [
     path('profiles/', ProfileListView.as_view(), name='profiles-list'),
     path('profiles/<int:pk>/', ProfileDetailView.as_view(), name='profile-detail'),
 
-    path('base-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('rest-auth/', include('rest_auth.urls')),
+    
+    # path('users/login/', UserLoginView.as_view(), name='user-login'),
+    # path('api-auth/', include('rest_framework.urls')),
+    # path('api/token/', TokenObtainPairView.as_view()),
+    # path('api/token/refresh/', TokenRefreshView.as_view()),
+
+
     path('auth/', include('rest_framework_social_oauth2.urls')),
     path('', include('social_django.urls')),
-    # http://localhost:8000/api/v1/login/vk-oauth2 --- authentication
+    # http://127.0.0.1:8000/api/v1/login/vk-oauth2 --- authentication
 
     path('password/change/', PasswordChangeView.as_view(), name='rest_password_change'),
     path('password/reset/', PasswordResetView.as_view(), name='rest_password_reset'),
