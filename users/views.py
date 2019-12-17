@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets, generics
+from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.response import Response
 from django.shortcuts import redirect
 from . import serializers
@@ -11,6 +12,19 @@ from .permissions import IsOwnerOrReadOnly, IsCurrentUserOrReadOnly
 
 class UserCreateView(generics.CreateAPIView):
     serializer_class = serializers.UserCreationSerializer
+
+
+# class UserLoginView(APIView):
+#     permission_classes = [AllowAny]
+#     serializer_class = serializers.UserLoginSerializer
+#
+#     def post(self, request, *args, **kwargs):
+#         data = request.data
+#         serializer = serializers.UserLoginSerializer(data=data)
+#         if serializer.is_valid(raise_exception=True):
+#             new_data = serializer.data
+#             return Response(new_data, status=HTTP_200_OK)
+#         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class UserListView(generics.ListAPIView):

@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 from .permissions import IsOwnerOrReadOnly, IsSenderOrReadOnly
 from .serializers import PostSerializer, CommentSerializer, DraftSerializer
 from rest_framework.filters import OrderingFilter
-from django.db.models.functions import ExtractMonth, ExtractWeek, ExtractDay
 
 
 class DraftCreation(generics.CreateAPIView):
