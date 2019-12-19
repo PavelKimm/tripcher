@@ -1,9 +1,10 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.db.models import F
 from django.urls import reverse
-from PIL import Image
 from users.models import Profile
+from utils import image_utils
 
 
 class Post(models.Model):
@@ -21,25 +22,14 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        img = Image.open(self.image.path)
-        max_size = 1000
-        if img.height > max_size:
-            h_percent = max_size / float(img.size[1])
-            w_size = int(float(img.size[0]) * h_percent)
-            img.thumbnail((w_size, max_size))
-            img.save(self.image.path)
-        if img.width > max_size:
-            w_percent = max_size / float(img.size[0])
-            h_size = int(float(img.size[1]) * w_percent)
-            img.thumbnail((max_size, h_size))
-            img.save(self.image.path)
+        image_utils.resize(self.image.path, 1000)
 
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
 
     def like_post(self, user):
         if user not in self.users_liked.all():
-            self.likes_number = Post.objects.get(id=self.id).likes_number + 1
+            self.likes_number = F('likes_number') + 1
             self.users_liked.add(user)
             self.save()
 
@@ -57,18 +47,7 @@ class Draft(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        img = Image.open(self.image.path)
-        max_size = 1000
-        if img.height > max_size:
-            h_percent = max_size / float(img.size[1])
-            w_size = int(float(img.size[0]) * h_percent)
-            img.thumbnail((w_size, max_size))
-            img.save(self.image.path)
-        if img.width > max_size:
-            w_percent = max_size / float(img.size[0])
-            h_size = int(float(img.size[1]) * w_percent)
-            img.thumbnail((max_size, h_size))
-            img.save(self.image.path)
+        image_utils.resize(self.image.path, 1000)
 
 
 class Comment(models.Model):

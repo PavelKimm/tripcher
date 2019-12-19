@@ -1,13 +1,13 @@
-from datetime import timedelta, date, datetime, time
-from django.shortcuts import redirect
-
-from rest_framework import generics, viewsets
+from datetime import timedelta, date
 from django.utils import timezone
-from .models import Post, Comment, Draft
+from django.shortcuts import redirect, get_object_or_404
+from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.filters import OrderingFilter
+from rest_framework.views import APIView
+from .models import Post, Comment, Draft
 from .permissions import IsOwnerOrReadOnly, IsSenderOrReadOnly
 from .serializers import PostSerializer, CommentSerializer, DraftSerializer
-from rest_framework.filters import OrderingFilter
 
 
 class DraftCreation(generics.CreateAPIView):
@@ -56,15 +56,13 @@ class PostList(generics.ListAPIView):
         queryset = Post.objects.all().order_by('-created_at')
 
         if 'period' in self.kwargs:
-            today = date.today()
+            today = timezone.now()
             if self.kwargs['period'] == 'month':
                 queryset = queryset.filter(created_at__year=today.year,
                                            created_at__month=today.month)
             elif self.kwargs['period'] == 'week':
-                week_ago = today - timedelta(days=7)
-                # today_max = today + timedelta(days=1)
-                today_max = datetime.combine(today, time.max)
-                queryset = queryset.filter(created_at__range=(week_ago, today_max))
+                week_ago = date.today() - timedelta(days=7)
+                queryset = queryset.filter(created_at__range=(week_ago, today))
             elif self.kwargs['period'] == 'day':
                 queryset = queryset.filter(created_at__year=today.year,
                                            created_at__month=today.month,
@@ -92,24 +90,14 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
 
     def perform_create(self, serializer):
-        post = Post.objects.get(pk=self.kwargs['pk'])
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
         sender = self.request.user
         serializer.save(post=post, sender=sender)
 
-    # def perform_destroy(self, instance):
-    #     instance = Comment.objects.get(pk=self.kwargs['comment_id'])
-    #     instance.delete()
-    #
-    # def partial_update(self, request, *args, **kwargs):
-    #     instance = Comment.objects.get(pk=self.kwargs['comment_id'])
-    #     serializer = self.serializer_class(instance, data=request.data, partial=True)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data)
 
-
-def like(request, pk):
-    post = Post.objects.get(pk=pk)
-    user = request.user
-    Post.like_post(post, user)
-    return redirect('post-detail', post.id)
+class PostLike(APIView):
+    def post(self, request, pk):
+        post = get_object_or_404(Post, pk=pk)
+        user = request.user
+        Post.like_post(post, user)
+        return redirect('post-detail', post.id)

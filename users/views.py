@@ -1,10 +1,9 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets, generics
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from . import serializers
 from .models import Profile
 from .permissions import IsOwnerOrReadOnly, IsCurrentUserOrReadOnly
@@ -12,19 +11,6 @@ from .permissions import IsOwnerOrReadOnly, IsCurrentUserOrReadOnly
 
 class UserCreateView(generics.CreateAPIView):
     serializer_class = serializers.UserCreationSerializer
-
-
-# class UserLoginView(APIView):
-#     permission_classes = [AllowAny]
-#     serializer_class = serializers.UserLoginSerializer
-#
-#     def post(self, request, *args, **kwargs):
-#         data = request.data
-#         serializer = serializers.UserLoginSerializer(data=data)
-#         if serializer.is_valid(raise_exception=True):
-#             new_data = serializer.data
-#             return Response(new_data, status=HTTP_200_OK)
-#         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class UserListView(generics.ListAPIView):
@@ -67,11 +53,12 @@ class FriendsListView(generics.ListAPIView):
     serializer_class = serializers.FriendsSerializer
 
 
-def change_friend(request, operation, pk):
-    to_profile = Profile.objects.get(pk=pk)
-    if request.user.profile.id != pk:
-        if operation == 'add':
-            Profile.make_friend(request.user, to_profile)
-        elif operation == 'remove':
-            Profile.remove_friend(request.user, to_profile)
-    return redirect('current-user-profile')
+class ChangeFriend(APIView):
+    def post(self, request, operation, pk):
+        to_profile = get_object_or_404(Profile, pk=pk)
+        if request.user.profile.id != pk:
+            if operation == 'add':
+                Profile.make_friend(request.user, to_profile)
+            elif operation == 'remove':
+                Profile.remove_friend(request.user, to_profile)
+        return redirect('current-user-profile')

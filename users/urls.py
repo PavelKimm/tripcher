@@ -1,11 +1,9 @@
 from django.urls import path, include
 from rest_auth.views import PasswordChangeView, PasswordResetView, PasswordResetConfirmView
 from rest_framework import routers
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-
 from .views import (UserCreateView, UserListView, UserDetailView, GroupViewSet,
                     ProfileListView, ProfileDetailView,
-                    CurrentUserProfileView, change_friend,
+                    CurrentUserProfileView, ChangeFriend,
                     FriendsListView)
 
 
@@ -23,12 +21,6 @@ urlpatterns = [
     path('profiles/<int:pk>/', ProfileDetailView.as_view(), name='profile-detail'),
 
     path('rest-auth/', include('rest_auth.urls')),
-    
-    # path('users/login/', UserLoginView.as_view(), name='user-login'),
-    # path('api-auth/', include('rest_framework.urls')),
-    # path('api/token/', TokenObtainPairView.as_view()),
-    # path('api/token/refresh/', TokenRefreshView.as_view()),
-
 
     path('auth/', include('rest_framework_social_oauth2.urls')),
     path('', include('social_django.urls')),
@@ -39,6 +31,6 @@ urlpatterns = [
     path('password/reset/confirm/', PasswordResetConfirmView.as_view(),
          name='rest_password_reset_confirm'),
 
-    path('users/<str:operation>/<int:pk>/', change_friend, name='change_friend'),
+    path('users/<int:pk>/<str:operation>/', ChangeFriend.as_view(), name='change_friend'),
     path('friends/', FriendsListView.as_view(), name='friends_list'),
 ]
