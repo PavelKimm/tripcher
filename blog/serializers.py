@@ -1,12 +1,21 @@
 from rest_framework import serializers
 from . import models
+from .models import Comment
+
+
+class RecursiveSerializer(serializers.Serializer):
+    def to_representation(self, value):
+        serializer = self.parent.parent.__class__(value, context=self.context)
+        return serializer.data
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    reply_set = RecursiveSerializer(many=True, read_only=True)
+
     class Meta:
         model = models.Comment
-        fields = ('url', 'post', 'sender', 'content')
-        read_only_fields = ('post', 'sender')
+        fields = ('id', 'url', 'content', 'sender', 'pub_date', 'parent', 'reply_set')
+        read_only_fields = ('sender', 'pub_date')
 
 
 class PostSerializer(serializers.ModelSerializer):

@@ -51,6 +51,10 @@ INSTALLED_APPS = [
     'rest_framework_social_oauth2',
 
     'rest_auth.registration',
+
+    # 'fluent_comments',
+    # 'threadedcomments',
+    # 'django_comments',
 ]
 
 MIDDLEWARE = [
@@ -167,6 +171,10 @@ REST_FRAMEWORK = {
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
+
+# COMMENTS_APP = 'fluent_comments'
+# FLUENT_COMMENTS_FORM_CLASS = 'fluent_comments.forms.CompactLabelsCommentForm'
+# FLUENT_COMMENTS_EXCLUDE_FIELDS = ('name', 'email', 'url', 'title')
 
 AUTHENTICATION_BACKENDS = (
     # django-rest-framework-social-oauth2

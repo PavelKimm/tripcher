@@ -1,9 +1,13 @@
+import json
 from datetime import timedelta, date
 from django.utils import timezone
 from django.shortcuts import redirect, get_object_or_404
 from rest_framework import generics, viewsets
+from rest_framework.decorators import action
+from django.db.models import Prefetch
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.filters import OrderingFilter
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Post, Comment, Draft
 from .permissions import IsOwnerOrReadOnly, IsSenderOrReadOnly
@@ -75,7 +79,7 @@ class PostList(generics.ListAPIView):
 
 
 class PostDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Post.objects.all()
+    queryset = Post.objects.prefetch_related(Prefetch('comments', queryset=Comment.objects.filter(parent=None)))
     serializer_class = PostSerializer
     permission_classes = (IsOwnerOrReadOnly, )
 
@@ -87,7 +91,7 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsSenderOrReadOnly)
-    queryset = Comment.objects.all()
+    queryset = Comment.objects.filter(parent=None)
 
     def perform_create(self, serializer):
         post = get_object_or_404(Post, pk=self.kwargs['pk'])
@@ -100,4 +104,4 @@ class PostLike(APIView):
         post = get_object_or_404(Post, pk=pk)
         user = request.user
         Post.like_post(post, user)
-        return redirect('post-detail', post.id)
+        return Response(json.dumps({'post': str(post), 'user': str(user)}))
