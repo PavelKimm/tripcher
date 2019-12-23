@@ -32,6 +32,10 @@ class Post(models.Model):
             self.likes_number = F('likes_number') + 1
             self.users_liked.add(user)
             self.save()
+        else:
+            self.likes_number = F('likes_number') - 1
+            self.users_liked.remove(user)
+            self.save()
 
 
 class Draft(models.Model):
@@ -53,7 +57,9 @@ class Draft(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
     sender = models.CharField(max_length=100)
+    parent = models.ForeignKey('self', related_name='reply_set', null=True, on_delete=models.CASCADE)
     content = models.TextField()
+    pub_date = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return f'{self.sender}: {self.content}'
+        return f'{self.sender}: {self.content[0:30]}'

@@ -51,13 +51,16 @@ INSTALLED_APPS = [
     'rest_framework_social_oauth2',
 
     'rest_auth.registration',
+
+    # 'fluent_comments',
+    # 'threadedcomments',
+    # 'django_comments',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -79,7 +82,6 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',
-                # 'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -167,6 +169,10 @@ REST_FRAMEWORK = {
 
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
+
+# COMMENTS_APP = 'fluent_comments'
+# FLUENT_COMMENTS_FORM_CLASS = 'fluent_comments.forms.CompactLabelsCommentForm'
+# FLUENT_COMMENTS_EXCLUDE_FIELDS = ('name', 'email', 'url', 'title')
 
 AUTHENTICATION_BACKENDS = (
     # django-rest-framework-social-oauth2
