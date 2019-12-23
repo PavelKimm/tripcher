@@ -1,9 +1,8 @@
 import json
 from datetime import timedelta, date
 from django.utils import timezone
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import generics, viewsets
-from rest_framework.decorators import action
 from django.db.models import Prefetch
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.filters import OrderingFilter
